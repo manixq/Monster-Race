@@ -1,0 +1,4 @@
+#include "Pingiel3D.h"
+
+PINGIEL_ICON ICON "pliki\ikona.ico"
+
