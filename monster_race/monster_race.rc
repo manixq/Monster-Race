@@ -1,0 +1,4 @@
+#include "monster_race.h"
+
+PINGIEL_ICON ICON "pliki\ikona.ico"
+
