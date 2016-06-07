@@ -381,16 +381,17 @@ void opcjeDraw()
 	static float r = 0.0;
 	glPushMatrix();
 	glTranslatef(50, -10, 0);
-
-	WypiszWymaluj(0, 62, 40, "'Backspace' - restart");
-	WypiszWymaluj(0, 58, 40, "'P' - odblokuj mysz");
+ WypiszWymaluj(0, 74, 40, "'B' - toggle Bloom ");
+ WypiszWymaluj(0, 70, 40, "'L' -toggle Light");
+	WypiszWymaluj(0, 66, 40, "'Backspace' - restart");
+	WypiszWymaluj(0, 62, 40, "'P' - toggle mouse");
 	WypiszWymaluj(0, 52, 40,"shininess");
 	WypiszWymaluj(0, 22, 40, "diffuse");
 	WypiszWymaluj(0, 37, 40, "specular");
 	WypiszWymaluj(0, 7, 40, "ambient");
 
 	teksturnik(27, 28);
-	glBegin(GL_TRIANGLE_STRIP);//BACK BUTTON
+	glBegin(GL_TRIANGLE_STRIP);//panel
 	glNormal3f(0.0, 0.0, 1.0);
 	glTexCoord2d(0, 0);	glVertex3d(-5, -5, 39);
 	glTexCoord2d(1, 0); glVertex3d(55, -5, 39);
@@ -404,7 +405,7 @@ void opcjeDraw()
 	przedzDraw(opcje[1] * 5, 15, selectOpt[1]);
 	przedzDraw(opcje[2] * 5, 30, selectOpt[2]);
 	przedzDraw(opcje[3] * 5, 45, selectOpt[3]);
-
+ /*
 	teksturnik(3, 0);//opcje
 
 	glBegin(GL_TRIANGLE_STRIP);//BACK BUTTON
@@ -413,7 +414,7 @@ void opcjeDraw()
 	glTexCoord2d(1, 0); glVertex3d(50, 65, 40);
 	glTexCoord2d(0, 1); glVertex3d(0, 80, 40 );
 	glTexCoord2d(1, 1); glVertex3d(50, 80, 40);
-	glEnd();
+	glEnd();*/
 
 	teksturnik(7, 9);//pasek
 
@@ -543,8 +544,10 @@ bool detektorKolizji(int z, int x)
 
 	if (z > 19 || x > 25)
 		return false;
+
 	if (mapa[z][x] == 1)
 		return true;
+
 	return false;
 }
 
@@ -553,12 +556,12 @@ void enemyAI(double& xE,double& zE)
 {
 	glTranslated(xE, 0, zE);	
 	glPushMatrix();
-	zE += 5* cos(kontE / 180 * 3.1415926);
-	xE += 5*sin(kontE/180*3.1415926);
+	zE +=4 * cos(kontE / 180 * 3.1415926);
+	xE +=4 *sin(kontE/180*3.1415926);
 	if (!detektorKolizji(ceil(zE), ceil(xE)))
 	{
-		zE -= 5*cos(kontE / 180 * 3.1415926);
-		xE -= 5 * sin(kontE / 180 * 3.1415926);
+		zE -=4 *cos(kontE / 180 * 3.1415926);
+		xE -=4  * sin(kontE / 180 * 3.1415926);
 		double xxE = xE + 100 * sin((kontE + 90) / 180 * 3.1415926);
 		double zzE = zE + 100 * cos((kontE + 90) / 180 * 3.1415926);
 		if (!detektorKolizji(ceil(zzE), ceil(xxE)))
@@ -605,8 +608,10 @@ void speedUp(int rnd)
 	glTexCoord2d(0, 1); glVertex3d(-5, 5, 0 );
 	glTexCoord2d(1, 1); glVertex3d(5, 5, 0);
 	glEnd();
-	podstawowy_shader->Use();
+ if (LIGHTS)
+   podstawowy_shader->Use();
 	glPopMatrix();
+ 
 }
 
 void winner()
@@ -685,9 +690,9 @@ void plansza()
 		bool animka = 0;
 		
 		if (lefty)
-			alpha -= speed;
+			alpha -= 3 * speed / 5;
 		if (righty)
-			alpha += speed;
+			alpha += 3 * speed / 5;
 		
 		if (upty)
 		{
@@ -700,7 +705,15 @@ void plansza()
 			{
 				animka = 0;
 				z += speed*cos(alpha / 180 * 3.1415926);
-				x -= speed*sin(alpha / 180 * 3.1415926);
+    if (!detektorKolizji(ceil(z), ceil(x)))
+    {
+     z -= speed*cos(alpha / 180 * 3.1415926);
+     x -= speed*sin(alpha / 180 * 3.1415926);
+     if (!detektorKolizji(ceil(z), ceil(x)))
+     {
+      z += speed*cos(alpha / 180 * 3.1415926);
+     }
+    }
 			}
 		}
 		
@@ -722,6 +735,7 @@ void plansza()
 		glTranslated(2, 0, 0);
 		particless.rysuj(x,z,animka);
 		glPopMatrix();
+  if(LIGHTS)
 		podstawowy_shader->Use();
 		glPushMatrix();
 		teksturnik(16, 17);

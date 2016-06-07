@@ -2,6 +2,7 @@
 out vec4 FragColor;
 uniform vec2 pixelSize;
 uniform sampler2D texture;
+uniform sampler2D depth;
 varying vec2 texcoord;
 uniform bool horizontal;
 
@@ -29,7 +30,7 @@ void main()
             result += texture2D(texture, texcoord - vec2(0.0, tex_offset.y * i)).rgb * weight[i]/400;
         }
     }
-    FragColor =vec4(result, 1.0);// vec4(1.0,0.0,0.0,0.5);
+    FragColor = vec4(result, 1.0);// vec4(1.0,0.0,0.0,0.5);
 }
 	
 

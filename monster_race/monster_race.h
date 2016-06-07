@@ -64,3 +64,6 @@ extern int righty;
 extern int upty;
 extern GLuint texture[];
 extern double speed;
+extern bool BLOOM;
+extern bool LIGHTS;
+extern int GAME_OVER;

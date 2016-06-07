@@ -28,12 +28,14 @@ void main()
 	vec3 texcolor=vec3(texture2D(img,texcoord));
 
 	float dist=length(position-lightPos2);
+
 	float att=1.0/(1.0+0.01*dist+0.001*dist*dist);
 	vec3 ambient=texcolor*lambient;
 	
 	vec3 surf2light=normalize(tangentSurface2light);
 	vec3 norm=normalize(texture2D(normalmap,texcoord).xyz*2.0-1.0);
-	float dcont=max(0.0,dot(norm,surf2light));
+
+	float dcont=max(0.0,dot(norm,surf2light));  //iloczyn skalarny, zero gdy ujemne, bo obvious i zero gdy ortogonalne(prospopadle)
 	vec3 diffuse=dcont*(texcolor*ldiffuse);
 	
 	vec3 surf2view=normalize(tangentSurface2view);

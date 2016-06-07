@@ -9,6 +9,7 @@ public:
 	Framebuffer(int w, int h, int x);
 	~Framebuffer();
 	GLuint OutColor();
+ GLuint OutDepth();
 	GLuint OutName();
 	GLuint* OutNamePong();
 	GLuint* OutColorPong();

@@ -15,12 +15,14 @@ void main()
 	texcoord=gl_MultiTexCoord0.xy;
 	
 	vec3 tangent;
-	vec3 v1=cross(gl_Normal,vec3(0.0,0.0,1.0));
+	vec3 v1=cross(gl_Normal,vec3(0.0,0.0,1.0));//ilocz wektorowy
 	vec3 v2=cross(gl_Normal,vec3(0.0,1.0,0.0));
+
 	if(length(v1)>length(v2))
 		tangent=v1;
 	else
 		tangent=v2;
+
 	vec3 n=normalize(gl_NormalMatrix*gl_Normal);
 	vec3 t=normalize(gl_NormalMatrix*tangent);
 	vec3 b=cross(n,t);

@@ -1,11 +1,5 @@
-﻿  framebuffer.cpp
-framebuffer.cpp(44): warning C4018: '<' : signed/unsigned mismatch
-  md5.cpp
-  obiekty.cpp
-  monster_race.cpp
-monster_race.cpp(518): warning C4018: '<' : signed/unsigned mismatch
-  particles.cpp
-  shader.cpp
+﻿  monster_race.cpp
+monster_race.cpp(540): warning C4018: '<' : signed/unsigned mismatch
   Generating code
   Finished generating code
   monster_race.vcxproj -> C:\Users\Mike\Desktop\Villentretenmerth\MULTIMEDIA STUDIO\tu bede pracowal\wyscig mutantow\Release\MonsterRace.exe

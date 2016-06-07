@@ -9,8 +9,6 @@ Framebuffer::Framebuffer(int w, int h) :pingpongFBO(nullptr), pingpongBuffer(nul
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_name);
 	
 		glGenTextures(1, &colorbuffer);
-		for (GLuint i = 0; i < 2; i++)
-		{
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, colorbuffer);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
@@ -21,16 +19,17 @@ Framebuffer::Framebuffer(int w, int h) :pingpongFBO(nullptr), pingpongBuffer(nul
 
 			// attach texture to framebuffer
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 , GL_TEXTURE_2D, colorbuffer, 0);
-		}
-
+		
+  
+   glBindTexture(GL_TEXTURE_2D, 0);
 		// The depth buffer
-		glGenRenderbuffers(1, &depthrenderbuffer);
-		glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, w, h);
+  glGenRenderbuffers(1, &depthrenderbuffer);
+	 glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
+	 glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, w, h);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
 
-		GLuint attachments[1] = { GL_COLOR_ATTACHMENT0 };
-		glDrawBuffers(1, attachments);
+		GLuint attachments[2] = { GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT };
+		glDrawBuffers(2, attachments);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	
 }
@@ -64,8 +63,12 @@ Framebuffer::~Framebuffer()
 
 GLuint Framebuffer::OutColor()
 {
-	
 	return colorbuffer;
+}
+
+GLuint Framebuffer::OutDepth()
+{
+ return depthrenderbuffer;
 }
 
 GLuint Framebuffer::OutName()

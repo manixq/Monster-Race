@@ -14,6 +14,8 @@ md5load potworbig;
 md5load enemy;
 md5load sgup;
 md5load sgdown;
+bool BLOOM = true;
+bool LIGHTS = true;
 bool keys[256];
 GLuint texture[29];
 static GLUquadricObj *quadric=nullptr;
@@ -181,7 +183,7 @@ HDC hDC = nullptr;//kontekst urzadzenia
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	
+
 	switch (message)
 	{	
 	case WM_MOUSEWHEEL:
@@ -204,7 +206,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			 height = rect.bottom - rect.top;
 		}
 		break;
+  
 	case WM_TIMER:
+  
 		switch (wParam)
 		{
 		case ID_TIMER_REDRAW://wymusznie odmalowania okna
@@ -225,16 +229,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			nex_frame++;
 			cur_frame++;
 			tajm++;//
+   
 			if (keys[VK_UP])upty = 1;
 				else upty = 0;
 			if (keys[VK_LEFT])lefty = 1;
 				else lefty = 0;
 			if (keys[VK_RIGHT])righty = 1;
-				else righty = 0;
-				if (keys['P'])mozna = true;
-				else
-					mozna = false;
-			break;
+			else righty = 0;
+		
+   break;
 		case ID_TIMER_REDRAW2:
 			DrawGLScene();
 			break;
@@ -250,16 +253,19 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			keys[wParam] = TRUE;
 		if (wParam == VK_ESCAPE)
 			PostQuitMessage(1);
+  
+  if (wParam == 'M')
+      GAME_OVER = 2;
 		break;
 	
 	case WM_KEYUP:
 		keys[wParam] = FALSE;
-		if (wParam == VK_RETURN)
-			enter = !enter;
-		if (wParam == VK_UP)
-			up=1;
-		if (wParam == VK_DOWN)
-			down=1;
+		if (wParam == VK_RETURN)		enter = !enter;
+  if (wParam == 'B') BLOOM = !BLOOM; 
+  if (wParam == 'L') LIGHTS = !LIGHTS;
+  if (wParam == 'P') mozna = !mozna;
+		if (wParam == VK_UP)	up=1;
+		if (wParam == VK_DOWN)		down=1;
 		break;
 	case WM_DESTROY:
 		
@@ -306,7 +312,8 @@ int DrawGLScene(GLvoid)
 	
 	skyBox();
 ///--------------------------------------->	glUseProgramObjectARB(p);
-	podstawowy_shader->Use();
+ if(LIGHTS)
+ 	podstawowy_shader->Use();
 	//system("pause");
 	glPopMatrix();
 	glTranslatef(-25, -30, ze);
@@ -324,9 +331,11 @@ int DrawGLScene(GLvoid)
 	menu();	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgramObjectARB(0);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, pingpong->OutNamePong()[0]);
-	bright_shader->Use();
+ if (BLOOM)
+ {
+  glBindFramebuffer(GL_FRAMEBUFFER, pingpong->OutNamePong()[0]);
+  bright_shader->Use();
+ }
 	glActiveTexture(GL_TEXTURE0);
 	
 	glBindTexture(GL_TEXTURE_2D, FBO->OutColor());
@@ -342,45 +351,58 @@ int DrawGLScene(GLvoid)
 	glTexCoord2d(0, 1); glVertex3d(-1.885, 1.035, 2.25);
 	glTexCoord2d(1, 1); glVertex3d(1.915, 1.035, 2.25);
 	glEnd();
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	
-	blur_shader->Use();
-	GLuint amount = 6;
-	GLboolean horizontal =false, first_iteration = true;
-	for (GLuint i = 0; i < amount; i++)
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, pingpong->OutNamePong()[horizontal]);		
-		glUniform1i(glGetUniformLocation(blur_shader->Out(), "horizontal"), horizontal);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, first_iteration ? pingpong->OutColorPong()[0] : pingpong->OutColorPong()[!horizontal]);
-		glUniform1i(glGetUniformLocation(blur_shader->Out(), "texture"), 0);
-		//RENDER HERE
-		glLoadIdentity();
-		glOrtho(-1, 1, -1, 1, 0, 1);
-		glNormal3f(0.0, 0.0, 1.0);
-		glBegin(GL_TRIANGLE_STRIP);//podobno wydajniej niz quad
-		glNormal3f(0.0, 0.0, 1.0);
-		glTexCoord2d(0, 0);	glVertex3d(-1.885, -0.965, 2.25);
-		glTexCoord2d(1, 0); glVertex3d(1.915, -0.965, 2.25);
-		glTexCoord2d(0, 1); glVertex3d(-1.885, 1.035, 2.25);
-		glTexCoord2d(1, 1); glVertex3d(1.915, 1.035, 2.25);
-		glEnd();
-		//ENDRENDERINGUNG
-		horizontal = !horizontal;
-		if (first_iteration)
-			first_iteration = false;
-	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+ if (BLOOM)
+ {
+  blur_shader->Use();
+  GLuint amount = 6;
+  GLboolean horizontal = false, first_iteration = true;
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, FBO->OutDepth());
+  glUniform1i(glGetUniformLocation(blur_shader->Out(), "depth"), 1);
+
+  for (GLuint i = 0; i < amount; i++)
+  {
+   glBindFramebuffer(GL_FRAMEBUFFER, pingpong->OutNamePong()[horizontal]);
+   glUniform1i(glGetUniformLocation(blur_shader->Out(), "horizontal"), horizontal);
+   glActiveTexture(GL_TEXTURE0);
+   glBindTexture(GL_TEXTURE_2D, first_iteration ? pingpong->OutColorPong()[0] : pingpong->OutColorPong()[!horizontal]);
+   glUniform1i(glGetUniformLocation(blur_shader->Out(), "texture"), 0);
+
+
+   //RENDER HERE
+   glLoadIdentity();
+   glOrtho(-1, 1, -1, 1, 0, 1);
+   glNormal3f(0.0, 0.0, 1.0);
+   glBegin(GL_TRIANGLE_STRIP);
+   glNormal3f(0.0, 0.0, 1.0);
+   glTexCoord2d(0, 0);	glVertex3d(-1.885, -0.965, 2.25);
+   glTexCoord2d(1, 0); glVertex3d(1.915, -0.965, 2.25);
+   glTexCoord2d(0, 1); glVertex3d(-1.885, 1.035, 2.25);
+   glTexCoord2d(1, 1); glVertex3d(1.915, 1.035, 2.25);
+   glEnd();
+   //ENDRENDERINGUNG
+   horizontal = !horizontal;
+   if (first_iteration)
+    first_iteration = false;
+  }
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+ }
 	glLoadIdentity();
 	glOrtho(-1, 1, -1, 1, 0, 1);
-	blend_shader->Use();
+
+ if(BLOOM)
+	 blend_shader->Use();
+
+
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, FBO->OutColor());
-	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, pingpong->OutColorPong()[1]);
-	glUniform1i(glGetUniformLocation(blend_shader->Out(), "scene"), 1);
-	glUniform1i(glGetUniformLocation(blend_shader->Out(), "bloomBlur"), 0);
+ glActiveTexture(GL_TEXTURE0);
+ glBindTexture(GL_TEXTURE_2D, FBO->OutColor());
+	glUniform1i(glGetUniformLocation(blend_shader->Out(), "scene"), 0);
+	glUniform1i(glGetUniformLocation(blend_shader->Out(), "bloomBlur"), 1);
 	glNormal3f(0.0, 0.0, 1.0);
 	glBegin(GL_TRIANGLE_STRIP);//podobno wydajniej niz quad
 	glNormal3f(0.0, 0.0, 1.0);
