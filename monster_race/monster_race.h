@@ -53,6 +53,7 @@ extern md5load potworbig;
 extern md5load enemy;
 extern md5load sgup;
 extern md5load sgdown;
+extern md5load skateboard;
 extern genCzastek particless;
 extern Shader* podstawowy_shader;
 extern GLfloat loc;

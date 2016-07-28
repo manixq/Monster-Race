@@ -208,6 +208,13 @@ void gracz(int x, int y, int z, int anim)
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	md5object.draw(x, y - 5, z, 0.3, anim,11);
+ if (upty && (anim == 0))
+ {
+  glUniform3f(glGetUniformLocation(podstawowy_shader->Out(), "lightPos"), -cos(alpha / 180 * 3.1415926), 0, sin(alpha / 180 * 3.1415926));
+  glRotated(speed*cos(alpha / 180 * 3.1415926), 0, 0, -1);
+  glRotatef(25.0, 0.0, 1.0, 0.0);
+  skateboard.draw(x+20, y - 200, 5, 50, NULL, 0);
+ }
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glPopMatrix();
@@ -382,7 +389,7 @@ void opcjeDraw()
 	glPushMatrix();
 	glTranslatef(50, -10, 0);
  WypiszWymaluj(0, 74, 40, "'B' - toggle Bloom ");
- WypiszWymaluj(0, 70, 40, "'L' -toggle Light");
+ WypiszWymaluj(0, 70, 40, "'L' -toggle Normalmaps");
 	WypiszWymaluj(0, 66, 40, "'Backspace' - restart");
 	WypiszWymaluj(0, 62, 40, "'P' - toggle mouse");
 	WypiszWymaluj(0, 52, 40,"shininess");
@@ -481,6 +488,7 @@ void menu()
 	}
 }
 
+//za rok zrobie random mapy...
 int mapa[][26] = 
 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2		//0
 , 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0		//1
@@ -722,7 +730,7 @@ void plansza()
 		glPushMatrix();
 		glRotated(180, 0, 1, 0);
 		glScaled(0.5, 0.5, 0.5);
-		gracz(0, 5, 0, animka);
+		gracz(0, 5, 0, animka);  
 		glPopMatrix();
 
 		glRotated(alpha, 0, 1, 0);  //obracam i przesuwam mape, a nie gracza
@@ -730,10 +738,10 @@ void plansza()
 
 		glUseProgramObjectARB(0);
 		glPushMatrix();
-		glTranslated(-1, 35, 0);
-		particless.rysuj(x,z,animka);
-		glTranslated(2, 0, 0);
-		particless.rysuj(x,z,animka);
+		glTranslated(-1, 1, 0);  
+		 particless.rysuj(x,z, upty && !animka);
+		glTranslated(2, 0, 0);  
+	 	particless.rysuj(x,z, upty && !animka);
 		glPopMatrix();
   if(LIGHTS)
 		podstawowy_shader->Use();

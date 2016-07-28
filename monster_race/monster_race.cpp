@@ -14,6 +14,7 @@ md5load potworbig;
 md5load enemy;
 md5load sgup;
 md5load sgdown;
+md5load skateboard;
 bool BLOOM = true;
 bool LIGHTS = true;
 bool keys[256];
@@ -143,6 +144,7 @@ int InitGL(GLvoid)                              // All Setup For OpenGL Goes Her
 	sgup.init("Pliki/stargate/sg1.md5mesh",animacje);
 	sgdown.init("Pliki/stargate/sg1empty.md5mesh",animacje);
 	enemy.init("Pliki/vagary/vagary.md5mesh", animacje);
+ skateboard.init("Pliki/skateboard/skateboard.md5mesh",animacje);
 
 	podstawowy_shader = new Shader(
 		"pliki/shaders/podstawowy.vert",
@@ -283,6 +285,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		sgup.cleanup();
 		potworbig.cleanup();
 		potworsmall.cleanup();
+  skateboard.cleanup();
 		PostQuitMessage(1);		
 		atexit(cleanup);
 		break;
